@@ -38,6 +38,8 @@ namespace Organic
         public bool IsRelocating { get; set; }
         private int UniqueScopeNumber { get; set; }
 
+        private List<string> IncludedFiles;
+
         /// <summary>
         /// Values (such as labels and equates) found in the code
         /// </summary>
@@ -84,6 +86,7 @@ namespace Organic
             LineNumbers = new Stack<int>();
             SuspendedLineCounts = new Stack<int>();
             FileNames = new Stack<string>();
+            IncludedFiles = new List<string>();
 
             ExpressionExtensions = new Dictionary<string, ExpressionExtension>();
             ReferencedValues = new List<string>();
@@ -144,12 +147,14 @@ namespace Organic
             LineNumbers.Push(0);
             RootLineNumber = 0;
             IfStack.Push(true);
+	        bool isFromExpanded;
 
             // Pass one
             string[] lines = code.Replace("\r", "").Split('\n');
             List<ListEntry> output = new List<ListEntry>();
             for (int i = 0; i < lines.Length; i++)
             {
+	            isFromExpanded = false;
                 if (SuspendedLineCounts.Count == 0)
                 {
                     LineNumbers.Push(LineNumbers.Pop() + 1);
@@ -157,7 +162,8 @@ namespace Organic
                 }
                 else
                 {
-                    int count = SuspendedLineCounts.Pop();
+	                isFromExpanded = true;
+					int count = SuspendedLineCounts.Pop();
                     count--;
                     if (count > 0)
                         SuspendedLineCounts.Push(count);
@@ -179,7 +185,7 @@ namespace Organic
                     SuspendedLineCounts.Push(sublines.Length);
                     continue;
                 }
-                ListEntry listEntry = new ListEntry(line, FileNames.Peek(), LineNumbers.Peek(), currentAddress, !noList);
+                ListEntry listEntry = new ListEntry(line, FileNames.Peek(), LineNumbers.Peek(), currentAddress, !noList, isFromExpanded);
                 listEntry.RootLineNumber = RootLineNumber;
                 if (HandleCodeLine != null)
                 {
@@ -250,7 +256,7 @@ namespace Organic
                     }
                     if (invalid)
                         continue;
-                    if (Values.ContainsKey(label.ToLower()) || LabelValues.ContainsKey(label.ToLower()))
+                    if (Values.ContainsKey(label) || LabelValues.ContainsKey(label))
                     {
                         listEntry.ErrorCode = ErrorCode.DuplicateName;
                         output.Add(listEntry);
@@ -263,7 +269,7 @@ namespace Organic
                     LabelValues.Add(new Label() 
                     {
                         LineNumber = LineNumbers.Peek(),
-                        Name = label.ToLower(),
+                        Name = label,
                         RootLineNumber = listEntry.RootLineNumber,
                         Address = currentAddress,
                     });
@@ -280,7 +286,7 @@ namespace Organic
                 {
                     line = ".equ " + line.Replace(".equ", "").TrimExcessWhitespace();
                 }
-                if (line.ToLower().StartsWith("dat"))
+                if (line.StartsWith("dat "))
                 {
                     line = "." + line;
                 }
@@ -297,7 +303,7 @@ namespace Organic
                         {
                             // Find included file
                             includedFileName = includedFileName.Trim('<', '>');
-                            string[] paths = IncludePath.Split(';');
+                            string[] paths = IncludePath.Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries );
                             foreach (var path in paths)
                             {
                                 if (File.Exists(Path.Combine(path, includedFileName)))
@@ -311,6 +317,10 @@ namespace Organic
                         {
                             listEntry.ErrorCode = ErrorCode.FileNotFound;
                             output.Add(listEntry);
+                        }
+                        else if (IncludedFiles.Contains(includedFileName))
+                        {
+                        	
                         }
                         else
                         {
@@ -337,6 +347,7 @@ namespace Organic
                                     GetDirectory(includedFileName)));
                             FileNames.Push(includedFileName);
                             LineNumbers.Push(0);
+                            IncludedFiles.Add(includedFileName);
                             i--;
                             continue;
                         }
@@ -453,7 +464,7 @@ namespace Organic
                         if (macroDefinition.Contains("("))
                         {
                             string paramDefinition = macroDefinition.Substring(macroDefinition.IndexOf("(") + 1);
-                            macro.Name = macroDefinition.Remove(macroDefinition.IndexOf("("));
+                            macro.Name = macroDefinition.Remove(macroDefinition.IndexOf("(")).Trim();
                             if (!paramDefinition.EndsWith(")"))
                             {
                                 listEntry.ErrorCode = ErrorCode.InvalidMacroDefintion;
@@ -518,20 +529,20 @@ namespace Organic
                         }
                         macro.Code = macro.Code.Trim('\n');
                         Macros.Add(macro);
-                        output.Add(new ListEntry(".macro " + macroDefinition, FileNames.Peek(), LineNumbers.Peek(), currentAddress));
+                        output.Add(new ListEntry(".macro " + macroDefinition, FileNames.Peek(), LineNumbers.Peek(), currentAddress, isFromExpanded));
                         output[output.Count - 1].CodeType = CodeType.Directive;
                         foreach (var codeLine in macro.Code.Split('\n'))
                         {
-                            output.Add(new ListEntry(codeLine, FileNames.Peek(), LineNumbers.Peek(), currentAddress));
+							output.Add( new ListEntry( codeLine, FileNames.Peek(), LineNumbers.Peek(), currentAddress, isFromExpanded ) );
                             output[output.Count - 1].CodeType = CodeType.Directive;
                         }
-                        output.Add(new ListEntry(".endmacro", FileNames.Peek(), LineNumbers.Peek(), currentAddress));
+						output.Add( new ListEntry( ".endmacro", FileNames.Peek(), LineNumbers.Peek(), currentAddress, isFromExpanded ) );
                         output[output.Count - 1].CodeType = CodeType.Directive;
                     }
                     else
                     {
                         // Parse preprocessor directives
-                        ParseDirectives(output, line);
+						ParseDirectives( output, line, isFromExpanded );
                     }
                 }
                 else
@@ -542,7 +553,7 @@ namespace Organic
                     bool mayHaveMacro = false;
                     foreach (Macro macro in Macros)
                     {
-                        if (line.ToLower().StartsWith(macro.Name.ToLower()))
+                        if (line.StartsWith(macro.Name))
                         {
                             mayHaveMacro = true;
                             break;
@@ -554,7 +565,7 @@ namespace Organic
                         userMacro.Args = new string[0];
                         string macroDefinition = line;
                         string paramDefinition = macroDefinition.Substring(macroDefinition.IndexOf("(") + 1);
-                        userMacro.Name = macroDefinition.Remove(macroDefinition.IndexOf("("));
+                        userMacro.Name = macroDefinition.Remove(macroDefinition.IndexOf("(")).Trim();
                         if (!paramDefinition.EndsWith(")"))
                         {
                             listEntry.ErrorCode = ErrorCode.InvalidMacroDefintion;
@@ -576,7 +587,7 @@ namespace Organic
                         bool macroMatched = false;
                         foreach (Macro macro in Macros)
                         {
-                            if (macro.Name.ToLower() == userMacro.Name.ToLower() &&
+                            if (macro.Name == userMacro.Name &&
                                 macro.Args.Length == userMacro.Args.Length)
                             {
                                 // Expand the macro
@@ -751,32 +762,32 @@ namespace Organic
                         if (!output[i].Code.StartsWith("."))
                             PriorGlobalLabel = output[i].Code.Remove(output[i].Code.Length - 1);
                     }
-                    if (output[i].Code.ToLower() == ".longform" || output[i].Code.ToLower() == "#longform")
+                    if (output[i].Code == ".longform" || output[i].Code == "#longform")
                     {
                         ForceLongLiterals = true;
                         continue;
                     }
-                    if (output[i].Code.ToLower() == ".shortform" || output[i].Code.ToLower() == "#shortform")
+                    if (output[i].Code == ".shortform" || output[i].Code == "#shortform")
                     {
                         ForceLongLiterals = false;
                         continue;
                     }
-                    if (output[i].Code.ToLower() == ".relocate" || output[i].Code.ToLower() == "#relocate")
+                    if (output[i].Code == ".relocate" || output[i].Code == "#relocate")
                     {
                         RelocatedAddresses = new List<ushort>();
                         TableInsertionIndex = i;
                         RelocationGroup++;
                     }
-                    if (output[i].Code.ToLower() == ".endrelocate" || output[i].Code.ToLower() == "#endrelocate")
+                    if (output[i].Code == ".endrelocate" || output[i].Code == "#endrelocate")
                     {
                         output[TableInsertionIndex].Output = new ushort[] { (ushort)RelocatedAddresses.Count }.Concat(RelocatedAddresses).ToArray();
                         TableInsertionIndex = -1;
                     }
-                    if (output[i].Code.ToLower() == ".uniquescope" && !inMacro)
+                    if (output[i].Code == ".uniquescope" && !inMacro)
                         PriorGlobalLabel = "_unique" + UniqueScopeNumber++;
-                    if (output[i].Code.ToLower().StartsWith(".macro ") || output[i].Code.ToLower().StartsWith("#macro "))
+                    if (output[i].Code.StartsWith(".macro ") || output[i].Code.StartsWith("#macro "))
                         inMacro = true;
-                    if (output[i].Code.ToLower() == ".endmacro" || output[i].Code.ToLower() == "#endmacro")
+                    if (output[i].Code == ".endmacro" || output[i].Code == "#endmacro")
                         inMacro = false;
                     if (output[i].Opcode != null && output[i].ErrorCode == ErrorCode.Success)
                     {
@@ -797,7 +808,7 @@ namespace Organic
                                     foreach (var label in LabelValues.Where(l => l.RelocationGroup == RelocationGroup))
                                     {
                                         foreach (var needle in result.References)
-                                            if (needle.ToLower() == label.Name.ToLower())
+                                            if (needle == label.Name)
                                             {
                                                 relocateB = true;
                                                 break;
@@ -819,7 +830,7 @@ namespace Organic
                                     foreach (var label in LabelValues.Where(l => l.RelocationGroup == RelocationGroup))
                                     {
                                         foreach (var needle in result.References)
-                                            if (needle.ToLower() == label.Name.ToLower())
+                                            if (needle == label.Name)
                                             {
                                                 relocateA = true;
                                                 break;
@@ -847,6 +858,7 @@ namespace Organic
                                         // if the size of the instruction has changed
                                         int lineNumber = output[i].RootLineNumber;
                                         int maxLineNumber = int.MaxValue;
+	                                    i++;
                                         for (; i < output.Count; i++)
                                         {
                                             if (output[i].Code.StartsWith(".org") || output[i].Code.StartsWith("#org"))
@@ -856,6 +868,8 @@ namespace Organic
                                             }
                                             if (output[i].RootLineNumber > lineNumber)
                                                 output[i].Address--;
+	                                        if ( output[i].RootLineNumber == lineNumber && output[i].IsFromExpanded )
+		                                        output[i].Address--;
                                         }
                                         foreach (Label l in LabelValues)
                                         {

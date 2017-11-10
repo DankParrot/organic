@@ -402,9 +402,9 @@ namespace Organic
 							tsb = new TabifiedStringBuilder();
 							tsb.WriteAt(0, listentry.FileName);
 							tsb.WriteAt(maxFileLength, "(line " + listentry.LineNumber + "): ");
-							if (listentry.Listed)
-								tsb.WriteAt(maxLength, "[0x" + LongHex((ushort)(listentry.Address + i)) + "] ");
-							else
+							//if (listentry.Listed)
+							//	tsb.WriteAt(maxLength, "[0x" + LongHex((ushort)(listentry.Address + i)) + "] ");
+							//else
 								tsb.WriteAt(maxLength, "[NOLIST] ");
 							string data = "";
 							for (int j = 0; j < 8 && i + j < listentry.Output.Length; j++)
@@ -423,7 +423,7 @@ namespace Organic
 						tsb = new TabifiedStringBuilder();
 						tsb.WriteAt(0, listentry.FileName);
 						tsb.WriteAt(maxFileLength, "(line " + listentry.LineNumber + "): ");
-						if (listentry.Listed)
+						if(listentry.Listed && listentry.Output != null)
 							tsb.WriteAt(maxLength, "[0x" + LongHex(listentry.Address) + "] ");
 						else
 							tsb.WriteAt(maxLength, "[NOLIST] ");
@@ -435,7 +435,7 @@ namespace Organic
 						tsb = new TabifiedStringBuilder();
 						tsb.WriteAt(0, listentry.FileName);
 						tsb.WriteAt(maxFileLength, "(line " + listentry.LineNumber + "): ");
-						if (listentry.Listed)
+						if(listentry.Listed && listentry.Output != null)
 							tsb.WriteAt(maxLength, "[0x" + LongHex(listentry.Address) + "] ");
 						else
 							tsb.WriteAt(maxLength, "[NOLIST] ");
@@ -445,7 +445,7 @@ namespace Organic
 					tsb = new TabifiedStringBuilder();
 					tsb.WriteAt(0, listentry.FileName);
 					tsb.WriteAt(maxFileLength, "(line " + listentry.LineNumber + "): ");
-					if (listentry.Listed)
+					if (listentry.Listed && (listentry.CodeType == CodeType.Label || listentry.Output != null))
 						tsb.WriteAt(maxLength, "[0x" + LongHex(listentry.Address) + "] ");
 					else
 						tsb.WriteAt(maxLength, "[NOLIST] ");
