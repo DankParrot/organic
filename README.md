@@ -2,7 +2,7 @@
 
 This is my fork of [Organic](https://github.com/SirCmpwn/organic), five years later.
 
-Organic is an assembler for the DCPU-16 architecture.  It supports version 1.7 of the [DCPU specification](http://pastebin.com/raw.php?i=Q4JvQvnM).  Organic also supports a number of advanced features, such as equates, relative addressing, macros, and expression evalulation.  It runs on Windows and probably Linux and Mac if you tweak it a little.
+Organic is an assembler for the DCPU-16 architecture.  It supports version 1.7 of the [DCPU specification](http://pastebin.com/raw.php?i=Q4JvQvnM).  Organic also supports a number of advanced features, such as equates, relative addressing, macros, and expression evalulation.  It runs on Windows and probably Linux and Mac too.
 
 This fork also pulls changes from [Measter's fork](https://github.com/Measter/organic).
 
