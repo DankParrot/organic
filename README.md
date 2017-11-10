@@ -331,4 +331,4 @@ Organic is coded as a library.  You can directly run the Main method to compile 
 
 ## Getting Involved
 
-Feel free to fork and submit pull requests with your changes.  You'll have good results with small, focused pull requests, rather than broad, sweeping ones.  You can also submit issues for bugs or feature requests.  You may email me as well at sir@cmpwn.com.  If you need general help with DCPU-16 assembly, join #0x10c-dev on Freenode.
+Feel free to fork and submit pull requests with your changes.  You'll have good results with small, focused pull requests, rather than broad, sweeping ones.  You can also submit issues for bugs or feature requests.  You may email me as well at dankparrot1@gmail.com.
