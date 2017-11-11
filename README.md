@@ -12,101 +12,33 @@ On Linux, make sure that you have "mono-complete" installed, and prepend any com
 
 ### Command Line Usage
 
-Usage: Organic.exe [parameters] [input file] [output file]
+```
+Usage:
+    Organic.exe [parameters] <input file> [output file]
+	
+	if [output file] is not specified, <input file>.bin will be used
+	if <input file> or [output file] is '-' then the standard input/output will be used
 
-[output file] is optional, and [input file].bin will be used if it is not specified.  If you specify an input or output file as "-", the standard input/output will be used instead of reading from the disk.
-
-### Parameters
-
-**--little-endian**
-
-Switches output to little-endian mode, the reverse of notchian syntax.
-
-**--equate [key] [value]**
-
-Specifies an equate to use at assembly-time.  Same as .equ in-code.
-
-Shorthand: -e
-
-**--help**
-
-Displays usage information.
-
-Shorthand: -h, -?, /h, /?
-
-**--input-file [filename]**
-
-An alternative way to specify the input file.
-
-**--include [path]**
-
-Adds [path] to the paths to search through for include files.  This only affects files included with <>, such as .include \<stdio.asm\>.  This is a semicolon-delimited list of directories.
-
-Shorthand: -i
-
-**--info [plugin name]**
-
-Retrieves information about the specified plugin.
-
-**--install [plugin name]**
-
-Installs [plugin name] from the [organic-plugins](https://github.com/SirCmpwn/Organic-Plugins) repository.
-
-**--json [output]**
-
-Outputs the results of assembly as JSON to \[output].
-
-**--listing [filename]**
-
-Specifies a file to output a code listing to.
-
-Shorthand: -l
-
-**--long-literals**
-
-Forces organic to use long-form literals, even when they might be shortened to short-form.
-
-**--output-file [filename]**
-
-An alternative way to specify the output file.
-
-Shorthand: -o, --output
-
-**--plugins**
-
-Shows a list of installed plugins.
-
-**--pipe "[assembly]"**
-
-Instead of using a file for input, the given assembly will be piped into the assembly core and assembled directly.
-
-Shorthand: -p
-
-**--quiet**
-
-Will not output errors or warnings.
-
-Shorthand: -q
-
-**--remove [plugin name]**
-
-Uninstalls the specified plugin.
-
-**--search [terms]**
-
-Searches the [organic-plugins](https://github.com/SirCmpwn/Organic-Plugins) repository for [terms].
-
-**--verbose**
-
-Will output a listing to the console.
-
-Shorthand: -v
-
-**--working-directory [directory]**
-
-Manually sets the working directory of Organic.
-
-Shorthand: -w
+Options:
+    
+    -h    --help                      Displays this message.
+    -o    --output <file>             An alternative way to specify the output file.
+          --input <file>              An alternative way to specify the input file.
+    -e    --equate [key] [value]      Adds an equate, with the same syntax as .equ.
+    -l    --listing [filename]        Outputs a listing to [filename].
+          --little-endian             Switches output to little-endian mode.
+          --long-literals             Forces all literal values to take up an entire word.
+    -q    --quiet                     Organic will not output error information.
+    -p    --pipe [assembly]           Assemble [assembly], instead of the input file.
+          --json [filename]           Outputs a machine-readable JSON listing to [filename]
+    -i    --include <path>            Adds [path] to the search index for #include <filename> files.
+    -w    --working-directory <dir>   Change Organic's working directory.
+    -v    --verbose                   Organic will output a listing to the console.
+		  --pause					  Pause after execution.
+	
+	Plugin Options:
+		--plugins, --install, --remove, --search, --info
+```
 
 ## Syntax
 
