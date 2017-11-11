@@ -14,9 +14,10 @@ Options:
     -q    --quiet                     Organic will not output error information.
     -p    --pipe [assembly]           Assemble [assembly], instead of the input file.
           --json [filename]           Outputs a machine-readable JSON listing to [filename]
-    -i    --include <path>            Adds [path] to the search index for #include <> files.
+    -i    --include <path>            Adds [path] to the search index for #include <filename> files.
     -w    --working-directory <dir>   Change Organic's working directory.
     -v    --verbose                   Organic will output a listing to the console.
 		  --pause					  Pause after execution.
-
-    --plugins, --install, --remove, --search, --info
+	
+	Plugin Options:
+		--plugins, --install, --remove, --search, --info

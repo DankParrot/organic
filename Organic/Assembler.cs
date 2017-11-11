@@ -127,19 +127,8 @@ namespace Organic
 		/// Assembles the provided code.
 		/// This will use the current directory to fetch include files and such.
 		/// </summary>
-		/// <param name="code"></param>
-		/// <returns></returns>
-		public List<ListEntry> Assemble(string code)
-		{
-			return Assemble(code, "sourceFile");
-		}
-
-		/// <summary>
-		/// Assembles the provided code.
-		/// This will use the current directory to fetch include files and such.
-		/// </summary>
 		/// <returns>A listing for the code</returns>
-		public List<ListEntry> Assemble(string code, string FileName)
+		public List<ListEntry> Assemble(string code, string FileName = "sourceFile")
 		{
 			FileNames = new Stack<string>();
 			LineNumbers = new Stack<int>();
@@ -282,6 +271,9 @@ namespace Organic
 				}
 				if (string.IsNullOrEmpty(line))
 					continue;
+
+				#region Preprocessor
+
 				if (line.Contains(".equ") && !line.StartsWith(".equ")) // TASM compatibility
 				{
 					line = ".equ " + line.Replace(".equ", "").TrimExcessWhitespace();
@@ -452,7 +444,7 @@ namespace Organic
 						RootLineNumber--;
 						Directory.SetCurrentDirectory(WorkingDirectories.Pop());
 					}
-					else if (line.StartsWith(".macro") && !noList)
+					else if ((line.StartsWith("#macro") || line.StartsWith(".macro")) && !noList)
 					{
 						if (!IfStack.Peek())
 							continue;
@@ -545,6 +537,9 @@ namespace Organic
 						ParseDirectives( output, line, isFromExpanded );
 					}
 				}
+
+				#endregion
+
 				else
 				{
 					if (!IfStack.Peek())
@@ -708,6 +703,7 @@ namespace Organic
 					}
 				}
 			}
+
 			return EvaluateAssembly(output);
 		}
 

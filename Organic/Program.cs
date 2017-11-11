@@ -29,7 +29,10 @@ namespace Organic
 			string jsonFile = null;
 			string pipe = null;
 			string workingDirectory = Directory.GetCurrentDirectory();
-			bool bigEndian = true, quiet = false, verbose = false;
+			bool bigEndian = true;
+			bool quiet = false;
+			bool verbose = false;
+
 			Assembler assembler = new Assembler();
 			assembler.IncludePath = Environment.GetEnvironmentVariable("ORGINCLUDE");
 			if (string.IsNullOrEmpty(assembler.IncludePath))
@@ -94,9 +97,6 @@ namespace Organic
 							case "-i":
 								assembler.IncludePath = Environment.GetEnvironmentVariable("ORGINCLUDE") + ";" + args[++i];
 								break;
-							case "--plugins":
-								ListPlugins(assembler);
-								return 0;
 							case "--working-directory":
 							case "-w":
 								workingDirectory = args[++i];
@@ -105,9 +105,20 @@ namespace Organic
 							case "-v":
 								verbose = true;
 								break;
+							case "--pause":
+								AppDomain.CurrentDomain.ProcessExit += (s, e) => {
+									Console.Write("Press any key to continue...");
+									Console.ReadKey();
+									Console.WriteLine();
+								};
+								break;
 							case "--debug-mode":
 								Console.ReadKey();
 								break;
+								
+							case "--plugins":
+								ListPlugins(assembler);
+								return 0;
 							case "--install":
 								assembler.InstallPlugin(args[++i]);
 								return 0;
@@ -120,6 +131,7 @@ namespace Organic
 							case "--info":
 								assembler.GetInfo(args[++i]);
 								return 0;
+							
 							default:
 								HandleParameterEventArgs hpea = new HandleParameterEventArgs(arg);
 								hpea.Arguments = args;
