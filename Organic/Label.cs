@@ -5,12 +5,12 @@ using System.Text;
 
 namespace Organic
 {
-    public class Label
-    {
-        public ushort Address { get; set; }
-        public string Name { get; set; }
-        public int LineNumber { get; set; }
-        internal int RootLineNumber { get; set; }
-        internal int RelocationGroup { get; set; }
-    }
+	public class Label
+	{
+		public ushort Address { get; set; }
+		public string Name { get; set; }
+		public int LineNumber { get; set; }
+		internal int RootLineNumber { get; set; }
+		internal int RelocationGroup { get; set; }
+	}
 }

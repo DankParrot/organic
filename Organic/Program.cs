@@ -281,7 +281,7 @@ namespace Organic
 			// TODO: Should we just use a JSON library?
 			var builder = new StringBuilder();
 			builder.AppendLine("[");
-			const string indent = "    ";
+			const string indent = "	";
 			foreach (var item in output)
 			{
 				builder.AppendLine(indent + "{");

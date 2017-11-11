@@ -5,12 +5,12 @@ using System.Text;
 
 namespace Organic
 {
-    public enum CodeType
-    {
-        BasicInstruction,
-        NonBasicInstruction,
-        Label,
-        Directive,
-        RelocationTable,
-    }
+	public enum CodeType
+	{
+		BasicInstruction,
+		NonBasicInstruction,
+		Label,
+		Directive,
+		RelocationTable,
+	}
 }

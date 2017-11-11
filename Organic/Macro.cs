@@ -5,10 +5,10 @@ using System.Text;
 
 namespace Organic
 {
-    public class Macro
-    {
-        public string Name { get; set; }
-        public string[] Args { get; set; }
-        public string Code { get; set; }
-    }
+	public class Macro
+	{
+		public string Name { get; set; }
+		public string[] Args { get; set; }
+		public string Code { get; set; }
+	}
 }

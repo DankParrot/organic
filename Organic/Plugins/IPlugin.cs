@@ -5,12 +5,12 @@ using System.Text;
 
 namespace Organic.Plugins
 {
-    public interface IPlugin
-    {
-        string Name { get; }
-        string Description { get; }
-        Version Version { get; }
+	public interface IPlugin
+	{
+		string Name { get; }
+		string Description { get; }
+		Version Version { get; }
 
-        void Loaded(Assembler assembler);
-    }
+		void Loaded(Assembler assembler);
+	}
 }
