@@ -779,7 +779,7 @@ namespace Organic
 						output[TableInsertionIndex].Output = new ushort[] { (ushort)RelocatedAddresses.Count }.Concat(RelocatedAddresses).ToArray();
 						TableInsertionIndex = -1;
 					}
-					if (output[i].Code == ".uniquescope" && !inMacro)
+					if ((output[i].Code == ".uniquescope" || output[i].Code == "#uniquescope") && !inMacro)
 						PriorGlobalLabel = "_unique" + UniqueScopeNumber++;
 					if (output[i].Code.StartsWith(".macro ") || output[i].Code.StartsWith("#macro "))
 						inMacro = true;

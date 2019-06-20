@@ -1,0 +1,3 @@
+set A, 0x08
+set B, 0x0A
+add C, 1

@@ -1,0 +1,17 @@
+#macro hault() {
+    sub PC, 1
+}
+
+set A, 0xDEAD   ; 7C01 [o=0x01, b=0x00, a=0x1F] DEAD
+set B, 0xBEEF   ; 7C21 [o=0x01, b=0x01, a=0x1F] BEEF
+set C, 0xDEAD   ; 7C41
+set X, 0xBEEF   ; 7C61
+set Y, 0xDEAD   ; 7C81
+set Z, 0xBEEF   ; 7CA1
+set I, 0xCAFE   ; 7CC1
+set J, 0xBABE   ; 7CE1
+
+; fails silently
+set 0x1000, 0x2000
+
+hault()

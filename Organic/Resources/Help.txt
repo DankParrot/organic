@@ -1,6 +1,9 @@
 
 Usage:
     Organic.exe [parameters] <input file> [output file]
+    
+    if [output file] is not specified, <input file>.bin will be used
+    if <input file> or [output file] is '-' then the standard input/output will be used
 
 Options:
     
@@ -17,7 +20,7 @@ Options:
     -i    --include <path>            Adds [path] to the search index for #include <filename> files.
     -w    --working-directory <dir>   Change Organic's working directory.
     -v    --verbose                   Organic will output a listing to the console.
-		  --pause					  Pause after execution.
-	
-	Plugin Options:
-		--plugins, --install, --remove, --search, --info
+          --pause                     Pause after execution.
+    
+    Plugin Options:
+        --plugins, --install, --remove, --search, --info

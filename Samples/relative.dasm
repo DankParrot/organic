@@ -1,0 +1,5 @@
+$:
+	ADD I, 1
+	ADD J, 2
+	SET PC, $-
+$:
